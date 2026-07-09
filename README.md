@@ -19,7 +19,7 @@ Open **http://localhost:8080/h2-console** in a browser.
 - Username: `sa`
 - Password: *(leave blank)*
 
-The database is in-memory, so it reseeds itself from `src/main/resources/data.sql` every time the app restarts — 8 sample breeds (4 cattle, 4 buffalo) are loaded automatically.
+The database is in-memory, so it reseeds itself from data.sql every restart — all 73 real NBAGR-recognised indigenous breeds load automatically (53 cattle + 20 buffalo).
 
 ## Endpoints
 
