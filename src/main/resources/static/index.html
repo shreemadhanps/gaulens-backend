@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GauLens — AI Breed Recognition for Cattle &amp; Buffaloes</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+
+<style>
+  :root{
+    --pasture:#204A28;
+    --pasture-light:#3E7D45;
+    --marigold:#F4A300;
+    --marigold-light:#FFC94D;
+    --rust:#C1440E;
+    --cream:#FFF8EC;
+    --ink:#17240F;
+    --sky:#2FBFD6;
+    --card:#FFFFFF;
+    --line: rgba(23,36,15,0.12);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    overflow-x:hidden;
+  }
+  .display, h1, h2, h3, .brand-word{
+    font-family:'Fraunces', serif;
+  }
+  .mono{
+    font-family:'Space Mono', monospace;
+  }
+  a{text-decoration:none;}
+  ::selection{background:var(--marigold); color:var(--ink);}
+
+  /* ---------- utility blobs ---------- */
+  .eyebrow{
+    font-family:'Space Mono', monospace;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.72rem;
+    color:var(--rust);
+    font-weight:700;
+  }
+  .btn-marigold{
+    background:var(--marigold);
+    border:2px solid var(--ink);
+    color:var(--ink);
+    font-weight:700;
+    padding:.7rem 1.6rem;
+    border-radius:999px;
+    box-shadow:4px 4px 0 var(--ink);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-marigold:hover{
+    transform:translate(-2px,-2px);
+    box-shadow:6px 6px 0 var(--ink);
+    color:var(--ink);
+  }
+  .btn-outline-ink{
+    border:2px solid var(--ink);
+    color:var(--ink);
+    font-weight:700;
+    padding:.7rem 1.6rem;
+    border-radius:999px;
+    background:transparent;
+    transition:all .15s ease;
+  }
+  .btn-outline-ink:hover{
+    background:var(--ink);
+    color:var(--cream);
+  }
+
+  /* ---------- navbar ---------- */
+  .navbar-gl{
+    background:rgba(255,248,236,.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .navbar-gl .nav-link{
+    color:var(--ink);
+    font-weight:600;
+    margin:0 .4rem;
+    position:relative;
+  }
+  .navbar-gl .nav-link::after{
+    content:"";
+    position:absolute;
+    left:0; bottom:-2px;
+    width:0%; height:2px;
+    background:var(--rust);
+    transition:width .2s ease;
+  }
+  .navbar-gl .nav-link:hover::after{width:100%;}
+  .brand-logo{
+    width:38px;height:38px;
+  }
+  .navbar-brand span.brand-word{
+    font-weight:700;
+    font-size:1.35rem;
+    color:var(--ink);
+  }
+  .navbar-brand span.brand-word em{
+    font-style:normal;
+    color:var(--rust);
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:6.5rem 0 4rem;
+    position:relative;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    top:-120px; right:-160px;
+    width:520px;height:520px;
+    background:radial-gradient(circle, rgba(244,163,0,.35), transparent 70%);
+    z-index:0;
+  }
+  .hero h1{
+    font-size:clamp(2.4rem, 5vw, 4rem);
+    font-weight:700;
+    line-height:1.05;
+    letter-spacing:-.01em;
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--pasture-light);
+  }
+  .hero-sub{
+    font-size:1.1rem;
+    max-width:36rem;
+    color:#3a3a30;
+  }
+  .stat-pill{
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    padding:.85rem 1rem;
+    background:var(--card);
+  }
+  .stat-pill .num{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:1.5rem;
+    color:var(--pasture);
+  }
+  .stat-pill .lbl{
+    font-size:.72rem;
+    color:#6b6b5e;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+
+  /* ---------- hero visual: scanning frame ---------- */
+  .scan-frame{
+    position:relative;
+    border:2px solid var(--ink);
+    border-radius:22px;
+    background:linear-gradient(160deg, #E9F3E4, #FFF3D6);
+    height:420px;
+    overflow:hidden;
+    box-shadow:8px 8px 0 var(--pasture);
+  }
+  .scan-frame svg.animal{
+    position:absolute;
+    left:50%; top:56%;
+    transform:translate(-50%,-50%);
+    width:78%;
+  }
+  .scanline{
+    position:absolute;
+    left:0; right:0;
+    height:3px;
+    background:linear-gradient(90deg, transparent, var(--sky), transparent);
+    box-shadow:0 0 18px 4px rgba(47,191,214,.7);
+    animation:sweep 2.8s ease-in-out infinite;
+  }
+  @keyframes sweep{
+    0%{top:6%;}
+    50%{top:92%;}
+    100%{top:6%;}
+  }
+  .tag-chip{
+    position:absolute;
+    background:var(--ink);
+    color:var(--cream);
+    font-family:'Space Mono',monospace;
+    font-size:.68rem;
+    padding:.28rem .55rem;
+    border-radius:999px;
+    opacity:0;
+    animation:popTag 6s ease-in-out infinite;
+    white-space:nowrap;
+  }
+  .tag-chip.t1{top:14%; left:8%; animation-delay:.2s;}
+  .tag-chip.t2{top:8%; right:10%; animation-delay:1.6s; background:var(--rust);}
+  .tag-chip.t3{bottom:22%; left:6%; animation-delay:3s; background:var(--pasture);}
+  .tag-chip.t4{bottom:12%; right:8%; animation-delay:4.3s; background:var(--marigold); color:var(--ink);}
+  @keyframes popTag{
+    0%{opacity:0; transform:translateY(6px) scale(.9);}
+    8%{opacity:1; transform:translateY(0) scale(1);}
+    22%{opacity:1;}
+    30%{opacity:0;}
+    100%{opacity:0;}
+  }
+  .corner{
+    position:absolute; width:22px; height:22px;
+    border:3px solid var(--rust);
+  }
+  .corner.tl{top:10px;left:10px;border-right:0;border-bottom:0;}
+  .corner.tr{top:10px;right:10px;border-left:0;border-bottom:0;}
+  .corner.bl{bottom:10px;left:10px;border-right:0;border-top:0;}
+  .corner.br{bottom:10px;right:10px;border-left:0;border-top:0;}
+
+  /* ---------- marquee ---------- */
+  .marquee-band{
+    background:var(--pasture);
+    transform:rotate(-1deg);
+    margin:1.5rem 0 3rem;
+    padding:.7rem 0;
+    overflow:hidden;
+    white-space:nowrap;
+    border-top:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+  }
+  .marquee-track{
+    display:inline-flex;
+    animation:scrollLeft 22s linear infinite;
+  }
+  .marquee-track span{
+    font-family:'Space Mono',monospace;
+    font-weight:700;
+    letter-spacing:.08em;
+    color:var(--cream);
+    font-size:.95rem;
+    padding:0 1.4rem;
+  }
+  .marquee-track span.dot{color:var(--marigold);}
+  @keyframes scrollLeft{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-50%);}
+  }
+
+  /* ---------- section heads ---------- */
+  .sec-pad{padding:4.5rem 0;}
+  .sec-head h2{
+    font-size:clamp(1.8rem,3.4vw,2.6rem);
+    font-weight:700;
+  }
+
+  /* ---------- how it works ---------- */
+  .step-card{
+    background:var(--card);
+    border:1.5px solid var(--line);
+    border-radius:18px;
+    padding:1.8rem 1.5rem;
+    height:100%;
+    position:relative;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .step-card:hover{
+    transform:translateY(-6px);
+    box-shadow:6px 10px 0 rgba(32,74,40,.18);
+  }
+  .step-num{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:2.6rem;
+    color:var(--marigold);
+    -webkit-text-stroke:1.5px var(--ink);
+    line-height:1;
+  }
+  .step-ic{
+    width:52px;height:52px;
+    border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:.9rem;
+  }
+
+  /* ---------- demo ---------- */
+  .demo-panel{
+    background:var(--ink);
+    border-radius:26px;
+    color:var(--cream);
+    padding:3rem;
+    position:relative;
+    overflow:hidden;
+  }
+  .demo-panel::after{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(circle at 85% 20%, rgba(244,163,0,.18), transparent 55%);
+    pointer-events:none;
+  }
+  .drop-zone{
+    border:2px dashed rgba(255,248,236,.4);
+    border-radius:18px;
+    padding:2.2rem 1.2rem;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .2s ease, background .2s ease;
+    background:rgba(255,248,236,.03);
+  }
+  .drop-zone.drag{
+    border-color:var(--marigold);
+    background:rgba(244,163,0,.08);
+  }
+  .drop-zone img{
+    max-height:180px;
+    border-radius:12px;
+    margin-bottom:.8rem;
+  }
+  .progress-track{
+    height:8px;
+    background:rgba(255,248,236,.15);
+    border-radius:99px;
+    overflow:hidden;
+    margin-top:1rem;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--sky),var(--marigold));
+    transition:width .1s linear;
+  }
+  .result-box{
+    background:rgba(255,248,236,.06);
+    border:1px solid rgba(255,248,236,.16);
+    border-radius:16px;
+    padding:1.4rem;
+    display:none;
+  }
+  .result-box.show{display:block; animation:fadeUp .5s ease;}
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .breed-bar-row{margin-bottom:.65rem;}
+  .breed-bar-track{
+    height:10px;background:rgba(255,248,236,.12);
+    border-radius:99px;overflow:hidden;
+  }
+  .breed-bar-fill{
+    height:100%;border-radius:99px;
+    background:linear-gradient(90deg,var(--marigold),var(--rust));
+    width:0%;
+    transition:width 1s cubic-bezier(.2,.8,.2,1);
+  }
+  .demo-note{
+    font-size:.75rem;
+    color:rgba(255,248,236,.55);
+  }
+
+  /* ---------- breed gallery ---------- */
+  .breed-card{
+    border-radius:20px;
+    border:1.5px solid var(--ink);
+    overflow:hidden;
+    background:var(--card);
+    height:100%;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .breed-card:hover{
+    transform:translateY(-6px) rotate(-.6deg);
+    box-shadow:6px 8px 0 var(--ink);
+  }
+  .breed-art{
+    height:170px;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .breed-art svg{width:62%;}
+  .breed-tag{
+    position:absolute; top:10px; left:10px;
+    font-family:'Space Mono',monospace;
+    font-size:.65rem;
+    background:var(--ink);
+    color:var(--cream);
+    padding:.2rem .55rem;
+    border-radius:999px;
+  }
+  .breed-body{padding:1.1rem 1.2rem 1.3rem;}
+  .breed-body h5{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    margin-bottom:.15rem;
+  }
+  .breed-meta{
+    font-size:.78rem;
+    color:#6b6b5e;
+    margin-bottom:.6rem;
+  }
+  .breed-trait{
+    display:inline-block;
+    font-size:.68rem;
+    background:var(--cream);
+    border:1px solid var(--line);
+    padding:.15rem .5rem;
+    border-radius:999px;
+    margin:.15rem .25rem .15rem 0;
+  }
+
+  .breed-filter-btn{
+    font-family:'Space Mono',monospace;
+    font-size:.78rem;
+    border:1.5px solid var(--ink);
+    background:var(--card);
+    color:var(--ink);
+    padding:.4rem 1rem;
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .breed-filter-btn:hover{background:#F3EEDF;}
+  .breed-filter-btn.active{background:var(--ink); color:var(--cream);}
+  .breed-search-input{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:.85rem;
+    border:1.5px solid var(--line);
+    border-radius:999px;
+    padding:.4rem 1rem;
+    min-width:220px;
+    background:var(--card);
+    color:var(--ink);
+  }
+  .breed-search-input:focus{outline:none; border-color:var(--ink);}
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal{
+    opacity:0;
+    transform:translateY(24px);
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ---------- stats strip ---------- */
+  .stats-strip{
+    background:var(--pasture-light);
+    border-top:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+  }
+  .stats-strip .num{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:2.6rem;
+    color:var(--cream);
+  }
+  .stats-strip .lbl{
+    color:#EAF4E4;
+    font-size:.85rem;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+
+  footer{
+    background:var(--ink);
+    color:var(--cream);
+    padding:2.6rem 0 1.6rem;
+  }
+  footer a{color:var(--cream); opacity:.75;}
+  footer a:hover{opacity:1; color:var(--marigold);}
+  footer hr{border-color:rgba(255,248,236,.15);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-gl fixed-top py-3">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#top">
+      <svg class="brand-logo" viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="23" fill="#F4A300" stroke="#17240F" stroke-width="2"/>
+        <path d="M14 20c0-2 2-4 4-4M34 20c0-2-2-4-4-4" stroke="#17240F" stroke-width="2.4" stroke-linecap="round"/>
+        <ellipse cx="24" cy="27" rx="11" ry="8" fill="#FFF8EC" stroke="#17240F" stroke-width="2"/>
+        <circle cx="20" cy="26" r="1.6" fill="#17240F"/>
+        <circle cx="28" cy="26" r="1.6" fill="#17240F"/>
+        <path d="M21 31c1 1 5 1 6 0" stroke="#17240F" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="brand-word">Gau<em>Lens</em></span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navMenu">
+      <ul class="navbar-nav align-items-lg-center gap-lg-2">
+        <li class="nav-item"><a class="nav-link" href="#how">How it works</a></li>
+        <li class="nav-item"><a class="nav-link" href="#demo">Try the demo</a></li>
+        <li class="nav-item"><a class="nav-link" href="#breeds">Breeds</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+        <li class="nav-item ms-lg-2"><a class="btn-marigold" href="#demo">Scan a photo</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div id="top"></div>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="container position-relative" style="z-index:1;">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-6">
+        <div class="eyebrow mb-3">● Image-based breed identification</div>
+        <h1 class="mb-3">Point a camera at a cow.<br>Know its <em>breed</em> in seconds.</h1>
+        <p class="hero-sub mb-4">GauLens uses computer vision to recognise indigenous cattle and buffalo breeds — Gir, Sahiwal, Murrah, Nili-Ravi and more — straight from a single photograph. Built for farmers, field workers and livestock researchers.</p>
+        <div class="d-flex flex-wrap gap-3 mb-4">
+          <a href="#demo" class="btn-marigold">Try live demo ↓</a>
+          <a href="#how" class="btn-outline-ink">See how it works</a>
+        </div>
+        <div class="row g-3">
+          <div class="col-4">
+            <div class="stat-pill text-center">
+              <div class="num">73</div>
+              <div class="lbl">indigenous breeds</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-pill text-center">
+              <div class="num">&lt;3s</div>
+              <div class="lbl">avg. scan time</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-pill text-center">
+              <div class="num">CNN</div>
+              <div class="lbl">vision model</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="scan-frame">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="scanline"></div>
+          <span class="tag-chip t1">Coat: reddish-brown ✓</span>
+          <span class="tag-chip t2">Horns: curved outward ✓</span>
+          <span class="tag-chip t3">Hump: prominent ✓</span>
+          <span class="tag-chip t4">Breed: Gir (94%) ✓</span>
+
+          <svg class="animal" viewBox="0 0 300 180" fill="none">
+            <ellipse cx="150" cy="120" rx="95" ry="42" fill="#C1440E" opacity=".9"/>
+            <path d="M75 95c0-22 20-30 35-22" stroke="#17240F" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <circle cx="70" cy="88" r="30" fill="#C1440E"/>
+            <path d="M50 68c-6-10-4-20 4-24M58 64c-2-10 2-18 10-20" stroke="#17240F" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <circle cx="62" cy="84" r="3.2" fill="#17240F"/>
+            <ellipse cx="46" cy="94" rx="6" ry="9" fill="#FFF3D6" stroke="#17240F" stroke-width="2"/>
+            <rect x="100" y="150" width="14" height="28" rx="5" fill="#17240F"/>
+            <rect x="140" y="155" width="14" height="26" rx="5" fill="#17240F"/>
+            <rect x="185" y="155" width="14" height="26" rx="5" fill="#17240F"/>
+            <rect x="220" y="150" width="14" height="28" rx="5" fill="#17240F"/>
+            <path d="M235 100c14 6 22 20 18 34" stroke="#17240F" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="150" cy="120" rx="95" ry="42" fill="none" stroke="#17240F" stroke-width="3"/>
+            <ellipse cx="130" cy="105" rx="20" ry="12" fill="#FFF3D6" opacity=".85"/>
+            <ellipse cx="175" cy="130" rx="14" ry="9" fill="#FFF3D6" opacity=".85"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MARQUEE ===== -->
+<div class="marquee-band">
+  <div class="marquee-track">
+    <span>GIR</span><span class="dot">•</span><span>SAHIWAL</span><span class="dot">•</span><span>THARPARKAR</span><span class="dot">•</span><span>MURRAH</span><span class="dot">•</span><span>NILI-RAVI</span><span class="dot">•</span><span>JAFFARABADI</span><span class="dot">•</span>
+    <span>GIR</span><span class="dot">•</span><span>SAHIWAL</span><span class="dot">•</span><span>THARPARKAR</span><span class="dot">•</span><span>MURRAH</span><span class="dot">•</span><span>NILI-RAVI</span><span class="dot">•</span><span>JAFFARABADI</span><span class="dot">•</span>
+  </div>
+</div>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how" class="sec-pad">
+  <div class="container">
+    <div class="sec-head reveal mb-5" style="max-width:34rem;">
+      <div class="eyebrow mb-2">The process</div>
+      <h2>Three steps, one photograph</h2>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 reveal">
+        <div class="step-card">
+          <div class="step-ic" style="background:#E9F3E4;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke="#204A28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="#204A28" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="step-num mb-2">01</div>
+          <h5>Upload a photo</h5>
+          <p class="mb-0" style="color:#5c5c50;">Snap a clear side-on picture of the cattle or buffalo, or pick one from your gallery.</p>
+        </div>
+      </div>
+      <div class="col-md-4 reveal">
+        <div class="step-card">
+          <div class="step-ic" style="background:#FFF0D6;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#C1440E" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#C1440E" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="step-num mb-2">02</div>
+          <h5>Model analyses features</h5>
+          <p class="mb-0" style="color:#5c5c50;">A trained CNN reads coat colour, horn shape, hump, ear type and body build to narrow down the breed.</p>
+        </div>
+      </div>
+      <div class="col-md-4 reveal">
+        <div class="step-card">
+          <div class="step-ic" style="background:#E0F6FA;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 12l6 6L20 6" stroke="#2FBFD6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="step-num mb-2">03</div>
+          <h5>Get the breed &amp; confidence</h5>
+          <p class="mb-0" style="color:#5c5c50;">See the predicted breed name, a confidence score, and the closest alternative matches.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DEMO ===== -->
+<section id="demo" class="sec-pad">
+  <div class="container">
+    <div class="demo-panel reveal">
+      <div class="row g-5 align-items-center position-relative" style="z-index:1;">
+        <div class="col-lg-5">
+          <div class="eyebrow mb-2" style="color:var(--marigold-light);">Try it now</div>
+          <h2 class="mb-3" style="color:var(--cream);">Upload a photo, watch it scan</h2>
+          <p style="color:rgba(255,248,236,.75);">This scans against your live GauLens Spring Boot API — the same one backed by the H2 breeds database.</p>
+          <p class="demo-note mb-0">
+            <span id="apiStatus">● Checking connection to backend…</span>
+            <a href="javascript:void(0)" id="retryBtn" style="display:none; color:#FFC94D; text-decoration:underline; margin-left:.5rem;">Retry now</a>
+          </p>
+        </div>
+        <div class="col-lg-7">
+          <div id="dropZone" class="drop-zone">
+            <div id="dropContent">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" style="margin-bottom:.5rem;"><path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke="#FFC94D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="#FFC94D" stroke-width="2" stroke-linecap="round"/></svg>
+              <p class="mb-1" style="color:var(--cream); font-weight:600;">Drop an image here, or click to browse</p>
+              <p class="mb-0 demo-note">JPG or PNG, any cattle / buffalo photo</p>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" class="d-none">
+          </div>
+
+          <div id="scanStatus" class="mt-3" style="display:none;">
+            <div class="d-flex justify-content-between mono demo-note">
+              <span id="scanLabel">Analysing image…</span>
+              <span id="scanPct">0%</span>
+            </div>
+            <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+          </div>
+
+          <div id="errorBox" class="mt-3" style="display:none; background:rgba(193,68,14,.15); border:1px solid var(--rust); border-radius:14px; padding:1rem 1.2rem;">
+            <strong style="color:#FFD9C4;">Couldn't reach the backend</strong>
+            <p class="mb-0 mt-1 demo-note" id="errorDetail">Make sure the Spring Boot app is running on port 8080.</p>
+          </div>
+
+          <div id="resultBox" class="result-box mt-3">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <div class="demo-note mb-1">PREDICTED BREED</div>
+                <div id="predBreed" style="font-family:'Fraunces',serif; font-weight:700; font-size:1.6rem; color:var(--cream);">—</div>
+              </div>
+              <div class="text-end">
+                <div class="demo-note mb-1">CONFIDENCE</div>
+                <div id="predConf" class="mono" style="font-size:1.6rem; color:var(--marigold-light); font-weight:700;">—</div>
+              </div>
+            </div>
+            <div class="demo-note mb-2">CLOSEST ALTERNATIVES</div>
+            <div id="altList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS STRIP ===== -->
+<section class="stats-strip py-5">
+  <div class="container">
+    <div class="row text-center g-4">
+      <div class="col-6 col-md-3 reveal">
+        <div class="num" data-count="53">0</div>
+        <div class="lbl">Indigenous cattle breeds</div>
+      </div>
+      <div class="col-6 col-md-3 reveal">
+        <div class="num" data-count="20">0</div>
+        <div class="lbl">Indigenous buffalo breeds</div>
+      </div>
+      <div class="col-6 col-md-3 reveal">
+        <div class="num" data-count="73">0</div>
+        <div class="lbl">Total recognized breeds</div>
+      </div>
+      <div class="col-6 col-md-3 reveal">
+        <div class="num" data-count="95" data-suffix="%">0</div>
+        <div class="lbl">Validation accuracy</div>
+      </div>
+    </div>
+    <p class="text-center demo-note mt-4 mb-0" style="color:#EAF4E4;">Breed counts per NBAGR-recognized indigenous breeds of India. Accuracy is a sample figure — replace with your model's real evaluation metric.</p>
+  </div>
+</section>
+
+<!-- ===== BREED GALLERY ===== -->
+<section id="breeds" class="sec-pad">
+  <div class="container">
+    <div class="sec-head reveal mb-5" style="max-width:34rem;">
+      <div class="eyebrow mb-2">The dataset</div>
+      <h2>Every breed GauLens recognises</h2>
+      <p class="mt-2 mb-0" style="color:#5c5c50;">Loaded live from the H2 database — 53 NBAGR-recognised indigenous cattle breeds and 20 recognised buffalo breeds.</p>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-4 reveal">
+      <button class="breed-filter-btn active" data-filter="ALL">All <span id="countAll">(0)</span></button>
+      <button class="breed-filter-btn" data-filter="CATTLE">Cattle <span id="countCattle">(0)</span></button>
+      <button class="breed-filter-btn" data-filter="BUFFALO">Buffalo <span id="countBuffalo">(0)</span></button>
+      <input id="breedSearch" type="text" placeholder="Search a breed name…" class="breed-search-input ms-auto">
+    </div>
+
+    <div id="breedGrid" class="row g-4">
+      <div class="col-12 text-center py-5 demo-note" id="breedLoading" style="color:#6b6b5e;">Loading breeds from the backend…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about" class="sec-pad" style="background:#F3EEDF;">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 reveal">
+        <div class="eyebrow mb-2">Why this matters</div>
+        <h2 class="mb-3">Breed ID, without the guesswork</h2>
+        <p style="color:#4a4a3e;">Misidentifying a breed affects vaccination schedules, breeding programmes and insurance claims. Field workers often rely on memory or a printed chart. GauLens turns that lookup into a photo scan — useful for extension officers, veterinary camps and dairy cooperatives working across mixed herds.</p>
+      </div>
+      <div class="col-lg-6 reveal">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="p-4" style="background:var(--card); border:1.5px solid var(--ink); border-radius:16px;">
+              <div class="mb-2">🐄</div>
+              <strong>Cattle breeds</strong>
+              <p class="mb-0 small" style="color:#6b6b5e;">Zebu breeds with distinct humps, horn curls and coat patterns.</p>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-4" style="background:var(--card); border:1.5px solid var(--ink); border-radius:16px;">
+              <div class="mb-2">🐃</div>
+              <strong>Buffalo breeds</strong>
+              <p class="mb-0 small" style="color:#6b6b5e;">Horn shape and body build separate river from swamp types.</p>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="p-4" style="background:var(--card); border:1.5px solid var(--ink); border-radius:16px;">
+              <div class="mb-2">📷</div>
+              <strong>Single-image inference</strong>
+              <p class="mb-0 small" style="color:#6b6b5e;">No special equipment — one clear side-profile photo is enough for a prediction.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div class="d-flex align-items-center gap-2">
+        <svg width="30" height="30" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="23" fill="#F4A300" stroke="#FFF8EC" stroke-width="2"/>
+          <ellipse cx="24" cy="27" rx="11" ry="8" fill="#FFF8EC"/>
+        </svg>
+        <span style="font-family:'Fraunces',serif; font-weight:700;">GauLens</span>
+      </div>
+      <div class="d-flex gap-4">
+        <a href="#how">How it works</a>
+        <a href="#demo">Demo</a>
+        <a href="#breeds">Breeds</a>
+        <a href="#about">About</a>
+      </div>
+    </div>
+    <hr class="my-4">
+    <div class="d-flex flex-wrap justify-content-between demo-note">
+      <span>Image-based breed recognition project — front-end prototype.</span>
+      <span>Built with HTML, CSS, Bootstrap 5 &amp; vanilla JS.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script>
+  // ---- scroll reveal ----
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:.15});
+  revealEls.forEach(el=>io.observe(el));
+
+  // ---- counters ----
+  const counters = document.querySelectorAll('.num[data-count]');
+  const cIo = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const el = e.target;
+        const target = parseInt(el.getAttribute('data-count'),10);
+        const suffix = el.getAttribute('data-suffix') || '';
+        const dur = 1400;
+        const start = performance.now();
+        function tick(now){
+          const p = Math.min((now-start)/dur, 1);
+          const val = Math.floor(p*target);
+          el.textContent = val.toLocaleString() + suffix;
+          if(p<1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+        cIo.unobserve(el);
+      }
+    });
+  }, {threshold:.4});
+  counters.forEach(el=>cIo.observe(el));
+
+  // ---- connect to the GauLens Spring Boot backend ----
+  // Absolute URL: works whether this page is opened via Live Server (:5500),
+  // VS Code Preview, or directly through Spring Boot itself (:8080).
+  // The backend's CorsConfig already allows requests from any origin.
+  const API_BASE = 'http://localhost:8080/api';
+
+  const dropZone = document.getElementById('dropZone');
+  const dropContent = document.getElementById('dropContent');
+  const fileInput = document.getElementById('fileInput');
+  const scanStatus = document.getElementById('scanStatus');
+  const progressFill = document.getElementById('progressFill');
+  const scanPct = document.getElementById('scanPct');
+  const resultBox = document.getElementById('resultBox');
+  const errorBox = document.getElementById('errorBox');
+  const errorDetail = document.getElementById('errorDetail');
+  const apiStatus = document.getElementById('apiStatus');
+
+  const retryBtn = document.getElementById('retryBtn');
+
+  // Keep checking the backend automatically until it connects — this fixes the
+  // common case where the page loads a few seconds BEFORE the Spring Boot app
+  // has finished starting up. No need to manually refresh once this is running.
+  let backendConnected = false;
+  let pollTimer = null;
+
+  function checkBackend(showChecking){
+    if(showChecking){
+      apiStatus.textContent = '● Checking connection to backend…';
+      apiStatus.style.color = '';
+      retryBtn.style.display = 'none';
+    }
+    fetch(`${API_BASE}/breeds`, { cache: 'no-store' })
+      .then(res => { if(!res.ok) throw new Error('bad status'); return res.json(); })
+      .then(data => {
+        backendConnected = true;
+        apiStatus.textContent = `● Connected — ${data.length} breeds loaded from H2`;
+        apiStatus.style.color = '#8FE3A5';
+        retryBtn.style.display = 'none';
+        if(pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        // breed gallery may have failed its own earlier fetch — reload it now too
+        if(typeof loadBreeds === 'function') loadBreeds();
+      })
+      .catch(() => {
+        apiStatus.textContent = '● Backend offline — waiting for the Spring Boot app on :8080… (auto-retrying)';
+        apiStatus.style.color = '#FFB199';
+        retryBtn.style.display = 'inline';
+      });
+  }
+
+  retryBtn.addEventListener('click', () => checkBackend(true));
+
+  checkBackend(true);
+  // Auto-retry every 3 seconds until connected, so starting the backend AFTER
+  // the page is already open still resolves itself without a manual refresh.
+  pollTimer = setInterval(() => { if(!backendConnected) checkBackend(false); }, 3000);
+
+  dropZone.addEventListener('click', ()=>fileInput.click());
+  dropZone.addEventListener('dragover', e=>{e.preventDefault(); dropZone.classList.add('drag');});
+  dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag'));
+  dropZone.addEventListener('drop', e=>{
+    e.preventDefault();
+    dropZone.classList.remove('drag');
+    if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', e=>{
+    if(e.target.files.length) handleFile(e.target.files[0]);
+  });
+
+  function handleFile(file){
+    if(!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      dropContent.innerHTML = `<img src="${ev.target.result}" alt="uploaded preview"><p class="mb-0 demo-note">${file.name}</p>`;
+      runScan(file);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function runScan(file){
+    resultBox.classList.remove('show');
+    errorBox.style.display = 'none';
+    scanStatus.style.display = 'block';
+    progressFill.style.width = '0%';
+
+    // Animate progress up to ~90% while we wait for the real API response,
+    // then snap to 100% the moment the response actually arrives.
+    let pct = 0;
+    const timer = setInterval(()=>{
+      pct = Math.min(pct + Math.random()*10 + 4, 90);
+      progressFill.style.width = pct + '%';
+      scanPct.textContent = Math.floor(pct) + '%';
+    }, 180);
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    fetch(`${API_BASE}/predict`, { method: 'POST', body: formData })
+      .then(res => {
+        if(!res.ok) return res.json().then(err => { throw new Error(err.message || 'Prediction failed'); });
+        return res.json();
+      })
+      .then(data => {
+        clearInterval(timer);
+        progressFill.style.width = '100%';
+        scanPct.textContent = '100%';
+        setTimeout(()=>{ scanStatus.style.display = 'none'; showResult(data); }, 250);
+      })
+      .catch(err => {
+        clearInterval(timer);
+        scanStatus.style.display = 'none';
+        errorDetail.textContent = err.message.includes('Failed to fetch')
+          ? 'Make sure the Spring Boot app is running on http://localhost:8080.'
+          : err.message;
+        errorBox.style.display = 'block';
+      });
+  }
+
+  function showResult(data){
+    // data matches PredictionResponse from PredictionController:
+    // { predictionId, predictedBreed, predictedType, confidence, alternatives:[{name,type,confidence}], scannedAt }
+    document.getElementById('predBreed').textContent = data.predictedBreed;
+    document.getElementById('predConf').textContent = Math.round(data.confidence) + '%';
+
+    const alts = data.alternatives || [];
+    document.getElementById('altList').innerHTML = alts.map(a => `
+      <div class="breed-bar-row">
+        <div class="d-flex justify-content-between mono" style="font-size:.78rem; color:rgba(255,248,236,.75);">
+          <span>${a.name} <span style="opacity:.5;">(${a.type})</span></span>
+          <span>${Math.round(a.confidence)}%</span>
+        </div>
+        <div class="breed-bar-track"><div class="breed-bar-fill" style="width:0%"></div></div>
+      </div>
+    `).join('');
+
+    resultBox.classList.add('show');
+    requestAnimationFrame(()=>{
+      document.querySelectorAll('.breed-bar-fill').forEach((el,i)=>{
+        setTimeout(()=>{ el.style.width = Math.round(alts[i].confidence) + '%'; }, 80*i);
+      });
+    });
+  }
+
+  // ---- breed gallery: load all breeds from the backend ----
+  const breedGrid = document.getElementById('breedGrid');
+  const breedSearch = document.getElementById('breedSearch');
+  const filterBtns = document.querySelectorAll('.breed-filter-btn');
+  let allBreeds = [];
+  let currentFilter = 'ALL';
+
+  const CATTLE_SVG = (fill) => `
+    <svg viewBox="0 0 200 130" fill="none">
+      <ellipse cx="100" cy="80" rx="65" ry="30" fill="${fill}"/>
+      <circle cx="48" cy="58" r="22" fill="${fill}"/>
+      <path d="M34 42c-4-7-2-14 4-17M42 40c-1-7 2-13 8-14" stroke="#17240F" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="42" cy="56" r="2.4" fill="#17240F"/>
+      <rect x="70" y="102" width="9" height="18" rx="4" fill="#17240F"/>
+      <rect x="100" y="106" width="9" height="16" rx="4" fill="#17240F"/>
+      <rect x="130" y="102" width="9" height="18" rx="4" fill="#17240F"/>
+    </svg>`;
+  const BUFFALO_SVG = (fill) => `
+    <svg viewBox="0 0 200 130" fill="none">
+      <ellipse cx="100" cy="82" rx="68" ry="32" fill="${fill}"/>
+      <circle cx="46" cy="60" r="23" fill="${fill}"/>
+      <path d="M28 46c-10-4-16-14-12-24M46 42c8-6 10-16 4-26" stroke="#17240F" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="40" cy="58" r="2.4" fill="#FFF3D6"/>
+      <rect x="70" y="106" width="9" height="18" rx="4" fill="#17240F"/>
+      <rect x="100" y="110" width="9" height="16" rx="4" fill="#17240F"/>
+      <rect x="130" y="106" width="9" height="18" rx="4" fill="#17240F"/>
+    </svg>`;
+  const CATTLE_FILLS = ['#C1440E','#D9C9A3','#B5652E','#E0A458','#8C5A3C'];
+  const BUFFALO_FILLS = ['#2B2B2B','#3A3A3A','#242424','#454545'];
+  const BG_TINTS = ['#FBEBD9','#F3EEE3','#EFEAF7','#E4ECE9','#F6E9E3','#EAF0E6'];
+
+  function breedCardHTML(breed, idx){
+    const isCattle = breed.type === 'CATTLE';
+    const svg = isCattle
+      ? CATTLE_SVG(CATTLE_FILLS[idx % CATTLE_FILLS.length])
+      : BUFFALO_SVG(BUFFALO_FILLS[idx % BUFFALO_FILLS.length]);
+    const bg = BG_TINTS[idx % BG_TINTS.length];
+    const traits = (breed.traits || []).slice(0,3).map(t => `<span class="breed-trait">${t}</span>`).join('');
+    return `
+      <div class="col-sm-6 col-lg-4 breed-item" data-type="${breed.type}" data-name="${breed.name.toLowerCase()}">
+        <div class="breed-card">
+          <div class="breed-art" style="background:${bg};">
+            <span class="breed-tag">${breed.type}</span>
+            ${svg}
+          </div>
+          <div class="breed-body">
+            <h5>${breed.name}</h5>
+            <div class="breed-meta">${breed.origin || ''}</div>
+            ${traits}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderBreeds(){
+    const q = (breedSearch.value || '').toLowerCase().trim();
+    const filtered = allBreeds.filter(b => {
+      const matchesType = currentFilter === 'ALL' || b.type === currentFilter;
+      const matchesQuery = !q || b.name.toLowerCase().includes(q);
+      return matchesType && matchesQuery;
+    });
+    if(filtered.length === 0){
+      breedGrid.innerHTML = `<div class="col-12 text-center py-5 demo-note" style="color:#6b6b5e;">No breeds match "${q}".</div>`;
+      return;
+    }
+    breedGrid.innerHTML = filtered.map((b,i) => breedCardHTML(b,i)).join('');
+  }
+
+  function loadBreeds(){
+    fetch(`${API_BASE}/breeds`)
+      .then(res => { if(!res.ok) throw new Error('bad status'); return res.json(); })
+      .then(data => {
+        allBreeds = data;
+        document.getElementById('countAll').textContent = `(${data.length})`;
+        document.getElementById('countCattle').textContent = `(${data.filter(b=>b.type==='CATTLE').length})`;
+        document.getElementById('countBuffalo').textContent = `(${data.filter(b=>b.type==='BUFFALO').length})`;
+        renderBreeds();
+      })
+      .catch(() => {
+        breedGrid.innerHTML = `<div class="col-12 text-center py-5 demo-note" style="color:#6b6b5e;">Couldn't load breeds — make sure the Spring Boot backend is running on :8080, then refresh.</div>`;
+      });
+  }
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.getAttribute('data-filter');
+      renderBreeds();
+    });
+  });
+  breedSearch.addEventListener('input', renderBreeds);
+
+  loadBreeds();
+</script>
+</body>
+</html>
