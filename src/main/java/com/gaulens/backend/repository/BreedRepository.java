@@ -11,6 +11,8 @@ public interface BreedRepository extends JpaRepository<Breed, Long> {
 
     List<Breed> findByType(AnimalType type);
 
+    List<Breed> findByCoatColor(String coatColor);
+
     Optional<Breed> findByNameIgnoreCase(String name);
 
     List<Breed> findByNameContainingIgnoreCase(String keyword);
