@@ -49,4 +49,11 @@ public class Breed {
     @Column(name = "trait")
     private List<String> traits = new ArrayList<>();
 
+    /**
+     * Dominant coat colour family, used by the colour-based prediction heuristic
+     * in PredictionService. One of: BLACK, REDDISH_BROWN, WHITE_GREY, GREY, SPOTTED_MIXED.
+     */
+    @Column(name = "coat_color")
+    private String coatColor;
+
 }
