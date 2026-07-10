@@ -96,7 +96,7 @@ If you're new to web development, here's what every technical word in this proje
 | **NBAGR** | The National Bureau of Animal Genetic Resources — the official Indian government body that recognises and registers indigenous livestock breeds. |
 | **Prediction** | The system's guess at which breed is shown in an uploaded photo. |
 | **Confidence Score** | A percentage showing how sure the system is about its top prediction. |
-| **Mock Predictor** | The current version doesn't use real AI/image analysis — it picks a plausible-sounding answer from the database instead, just to demonstrate the full app working end-to-end. This will be replaced with a real trained model later. |
+| **Colour-Matching Heuristic** | The current version reads the uploaded photo's actual pixel colours (black, reddish-brown, white-grey, grey, or spotted) and matches that against each breed's recorded coat colour. This is real image analysis, but not full AI breed recognition — many breeds share a colour family, so it can't yet tell visually similar breeds apart by shape or horns. A trained AI model is the planned next step. |
 
 ---
 
@@ -122,7 +122,7 @@ Backend (Spring Boot REST API)
 Database (H2)
 ```
 
-Three-tier architecture: presentation, application, and data layers are fully separated, so the mock prediction logic can later be swapped for a real trained model without changing the frontend or database.
+Three-tier architecture: presentation, application, and data layers are fully separated, so the colour-matching prediction logic can later be swapped for a real trained model without changing the frontend or database.
 
 ---
 
@@ -200,7 +200,7 @@ JDBC URL: `jdbc:h2:mem:gaulensdb` · Username: `sa` · Password: *(blank)*
 
 ## 12. Project Status / Known Limitation
 
-This project currently uses a **mock predictor** — it selects a plausible result from the seeded breed data rather than analysing the actual image pixels. This was a deliberate choice to validate the complete frontend–backend–database pipeline first. See **Future Scope** below for the plan to replace it with a trained CNN model.
+This project currently uses a **colour-matching heuristic** — it genuinely analyses the uploaded photo's average pixel colour and matches it against each breed's documented coat colour, rather than picking randomly. This is a real, working improvement, but it is not yet true breed recognition, since colour alone cannot distinguish breeds that share a coat colour family. See **Future Scope** below for the plan to replace it with a trained CNN model.
 
 ---
 
