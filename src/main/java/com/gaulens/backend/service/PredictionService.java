@@ -73,6 +73,18 @@ public class PredictionService {
         }
 
         ColorProfile profile = analyseColor(image);
+
+        // Basic sanity check: a genuinely blank/flat image (solid colour swatch,
+        // blank scan, near-uniform background) is very unlikely to be a real
+        // animal photo. This does NOT detect "is this a cow" -- it only rejects
+        // the most obvious non-photo uploads. A photo of any other animal,
+        // object, or person will still pass through and receive a breed guess,
+        // since telling those apart from cattle/buffalo would require a trained
+        // object-recognition model, which is out of scope for this heuristic.
+        if (profile.stdDev() < 6) {
+            throw new IllegalArgumentException(
+                "Couldn't detect a clear subject in this photo. Please upload a clear photo of a cattle or buffalo.");
+        }
         String coatColorFamily = profile.family;
 
         List<Breed> allBreeds = breedRepository.findAll();
@@ -234,5 +246,3 @@ public class PredictionService {
     private record ColorProfile(String family, double avgR, double avgG, double avgB, double brightness, double stdDev) {}
 
 }
-
-
