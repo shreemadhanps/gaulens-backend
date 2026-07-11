@@ -631,7 +631,7 @@
         <div class="col-lg-5">
           <div class="eyebrow mb-2" style="color:var(--marigold-light);">Try it now</div>
           <h2 class="mb-3" style="color:var(--cream);">Upload a photo, watch it scan</h2>
-          <p style="color:rgba(255,248,236,.75);">This scans against your live GauLens Spring Boot API — the same one backed by the H2 breeds database.</p>
+          <p style="color:rgba(255,248,236,.75);">This scans against your live GauLens Spring Boot API. The backend now analyses your photo's actual coat colour and matches it against the database — a real (but simple) heuristic, not yet a trained AI model.</p>
           <p class="demo-note mb-0">
             <span id="apiStatus">● Checking connection to backend…</span>
             <a href="javascript:void(0)" id="retryBtn" style="display:none; color:#FFC94D; text-decoration:underline; margin-left:.5rem;">Retry now</a>
@@ -829,7 +829,13 @@
   // Absolute URL: works whether this page is opened via Live Server (:5500),
   // VS Code Preview, or directly through Spring Boot itself (:8080).
   // The backend's CorsConfig already allows requests from any origin.
-  const API_BASE = 'http://localhost:8080/api';
+  // ---- connect to the GauLens Spring Boot backend ----
+  // Relative path: works correctly whether this page is opened directly at
+  // localhost:8080, OR through a tunnel like ngrok (https://xxxx.ngrok-free.dev).
+  // A hardcoded 'http://localhost:8080/api' would break for anyone opening a
+  // tunnel link, since "localhost" in their browser means THEIR OWN device,
+  // not the machine actually running the server.
+  const API_BASE = '/api';
 
   const dropZone = document.getElementById('dropZone');
   const dropContent = document.getElementById('dropContent');
