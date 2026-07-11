@@ -2,6 +2,12 @@
 
 A full-stack web application that identifies indigenous Indian cattle and buffalo breeds from a photograph, backed by a database of all 73 NBAGR-recognised breeds (53 cattle + 20 buffalo).
 
+## 🌐 Live Demo
+
+Try it directly, no setup needed: **https://gaulens-backend.onrender.com**
+
+*(Hosted on Render's free tier — if the app has been idle, the first load may take 30-50 seconds while it wakes up. Subsequent loads are fast.)*
+
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3-brightgreen)
 ![H2](https://img.shields.io/badge/Database-H2-blue)
@@ -183,11 +189,16 @@ Three-tier architecture: presentation, application, and data layers are fully se
 
 ## 11. Getting Started
 
-### Prerequisites
+### Option A — Just use the live version
+No installation needed: **https://gaulens-backend.onrender.com**
+
+### Option B — Run it yourself locally
+
+**Prerequisites**
 - Java 17+
 - Apache Maven 3.6+
 
-### Run it
+**Run it**
 ```bash
 mvn spring-boot:run
 ```
@@ -214,3 +225,4 @@ This project currently uses a **colour-matching heuristic** — it genuinely ana
 - [ ] Expand dataset as NBAGR registers new breeds
 
 ---
+
